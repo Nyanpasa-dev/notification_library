@@ -51,11 +51,10 @@ class MyGateway implements Gateway {
         this.startHeartbeat();
     }
 
-    public closeWebSocketServer(): void {
+    public async close(): Promise<void> {
         this.wss?.close();
         this.server?.close();
-
-        console.log('WebSocket server closed');
+        clearInterval(this.heartbeatInterval as NodeJS.Timeout);
     }
 
     private createServer(isProduction: boolean): http.Server | https.Server {

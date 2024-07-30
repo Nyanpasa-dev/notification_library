@@ -87,7 +87,7 @@ export interface Gateway {
   /**
    * Закрывает WebSocket сервер.
    */
-  closeWebSocketServer(): void;
+  close(): void;
 }
 
 /**

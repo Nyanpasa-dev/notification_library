@@ -24,11 +24,9 @@ class NotificationManager {
 
   private setupQueueEvents(): void {
     this.queueEvents.on('completed', ({ jobId }) => {
-      console.log(`Job ${jobId} has completed!`);
     });
 
     this.queueEvents.on('failed', ({ jobId, failedReason }) => {
-      console.log(`Job ${jobId} has failed with reason ${failedReason}`);
     });
   }
 
@@ -119,6 +117,13 @@ class NotificationManager {
 
   private async sendEmailNotification({ receivers, message }: EmailParams): Promise<void> {
     // Implement email sending logic here
+  }
+
+  public async closeResources() {
+    this.gateway.close();
+    await this.queue.close();
+    await this.worker.close();
+    await this.queueEvents.close();
   }
 }
 

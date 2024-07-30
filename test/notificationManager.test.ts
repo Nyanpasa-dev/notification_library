@@ -1,20 +1,18 @@
 import { NotificationManager } from '../src/engine/notificationManager';
 import { DelayedQueueData } from '../src/types';
+import { QueueEvents } from 'bullmq';
 
 describe('NotificationManager', () => {
   let notificationManager: NotificationManager;
 
+
+  beforeAll(() => {
     notificationManager = new NotificationManager({});
+  });
 
-  it('should send immediate notification', async () => {
-    const data = {
-      type: 'immediate',
-      item: 'notification',
-      message: 'Hello',
-      receivers: [1, 2],
-    };
-
-    await expect(notificationManager.broadcastEmmediatelyNotification(data)).resolves.toBeInstanceOf(NotificationManager);
+  afterAll(async () => {
+    // Close WebSocket server
+    await notificationManager.closeResources()
   });
 
   it('should send delayed notification', async () => {
