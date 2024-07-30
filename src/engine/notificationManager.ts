@@ -44,7 +44,7 @@ class NotificationManager {
   }
 
   public async broadcastDelayedNotification(data: DelayedQueueData): Promise<this> {
-    if (data.delay < 0 || data.delay == null || data.delay == undefined) {
+    if (data.delay ?? -1 < 0) {
       throw new Error("Delay is invalid.");
     }
 

@@ -7,9 +7,9 @@ import { Client, Gateway, MessageData, SendMessageParams } from '../types';
 
 class MyGateway implements Gateway {
     private clients: Set<Client>;
-    private heartbeatInterval: NodeJS.Timeout;
-    private server: http.Server;
-    private wss: WebSocketServer;
+    private heartbeatInterval: NodeJS.Timeout | undefined;
+    private server: http.Server | undefined;
+    private wss: WebSocketServer | undefined;
 
     constructor() {
         this.clients = new Set<Client>();
@@ -52,8 +52,8 @@ class MyGateway implements Gateway {
     }
 
     public closeWebSocketServer(): void {
-        this.wss.close();
-        this.server.close();
+        this.wss?.close();
+        this.server?.close();
 
         console.log('WebSocket server closed');
     }
@@ -84,7 +84,7 @@ class MyGateway implements Gateway {
 
     private startHeartbeat(): void {
         this.heartbeatInterval = setInterval(() => {
-            this.wss.clients.forEach((ws: WebSocket, _ws2: WebSocket, _set: Set<WebSocket>) => {
+            this.wss?.clients.forEach((ws: WebSocket, _ws2: WebSocket, _set: Set<WebSocket>) => {
                 const client = ws as Client;
                 if (!client.isAlive) {
                     return client.terminate();

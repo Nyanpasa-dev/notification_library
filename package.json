@@ -1,6 +1,6 @@
 {
   "name": "@nyanpasa-dev/noty-nyan",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A real-time notification system using WebSockets, Redis queues, Telegram and Email integration. It supports scalable and asynchronous notification delivery.",
   "files": [
     "dist"
