@@ -9,8 +9,6 @@ noty-nyan is a TypeScript-based service for managing and sending notifications t
 - Configuration
 - API
 - Testing
-- Contributing
-- License
 
 ## Installation
 
@@ -135,8 +133,6 @@ noty-nyan — это сервис на TypeScript для управления и
 - Конфигурация
 - API
 - Тестирование
-- Вклад
-- Лицензия
 
 ## Установка
 
