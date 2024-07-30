@@ -17,6 +17,7 @@ class NotificationManager {
       await this.processJob(job);
     }, { connection: redisConnection });
     this.queueEvents = new QueueEvents(queueName);
+    
 
     this.setupQueueEvents();
   }
@@ -44,12 +45,10 @@ class NotificationManager {
   }
 
   public async broadcastDelayedNotification(data: DelayedQueueData): Promise<this> {
-    if (data.delay ?? -1 < 0) {
+    if ((data.delay ?? -1) < 0) {
       throw new Error("Delay is invalid.");
     }
-
     await this.addNotificationToQueue(data);
-
     return this;
   }
 

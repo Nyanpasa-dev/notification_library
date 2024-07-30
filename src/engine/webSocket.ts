@@ -100,6 +100,7 @@ class MyGateway implements Gateway {
         const messageData: MessageData = { key, data, message };
         const uniqueReceivers = [...new Set(receivers)];
 
+
         this.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN && uniqueReceivers.includes(Number(client.userId))) {
                 client.send(JSON.stringify(messageData));

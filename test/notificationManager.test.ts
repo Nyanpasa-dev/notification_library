@@ -1,4 +1,5 @@
 import { NotificationManager } from '../src/engine/notificationManager';
+import { DelayedQueueData } from '../src/types';
 
 describe('NotificationManager', () => {
   let notificationManager: NotificationManager;
@@ -17,11 +18,11 @@ describe('NotificationManager', () => {
   });
 
   it('should send delayed notification', async () => {
-    const data = {
+    const data: DelayedQueueData = {
       type: 'delayed',
       item: 'notification',
       message: 'Hello',
-      delay: 5000,
+      delay: 10000, // Убедитесь, что значение задержки является допустимым
     };
 
     await expect(notificationManager.broadcastDelayedNotification(data)).resolves.toBeInstanceOf(NotificationManager);
@@ -77,7 +78,7 @@ describe('NotificationManager', () => {
   });
 
   it('should throw an error if data is empty for bulk immediate notifications', async () => {
-    const data = [];
+    const data: any[] = [];
 
     await expect(notificationManager.bulkBroadcastEmmediatelyNotification(data)).rejects.toThrow('Data is empty.');
   });
@@ -94,7 +95,7 @@ describe('NotificationManager', () => {
   });
 
   it('should throw an error if data is empty for bulk delayed notifications', async () => {
-    const data = [];
+    const data: any[] = [];
 
     await expect(notificationManager.bulkBroadcastDelayedNotification(data, 5000)).rejects.toThrow('Data is empty.');
   });
