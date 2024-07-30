@@ -1,7 +1,3 @@
-Sure, here's a README for your GitHub repository:
-
----
-
 # noty-nyan
 
 noty-nyan is a TypeScript-based service for managing and sending notifications through various channels such as WebSocket, Telegram, and Email. It supports both immediate and delayed notifications.
