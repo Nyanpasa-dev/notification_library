@@ -1,6 +1,6 @@
 {
-  "name": "@nyanpasa/notification_library",
-  "version": "0.0.1",
+  "name": "@nyanpasa/noty-nyan",
+  "version": "1.0.0",
   "description": "A real-time notification system using WebSockets, Redis queues, Telegram and Email integration. It supports scalable and asynchronous notification delivery.",
   "files": [
     "dist"
@@ -9,7 +9,7 @@
     "build": "tsc"
   },
   "publishConfig": {
-    "access": "restricted"
+    "registry": "https://npm.pkg.github.com/"
   },
   "type": "module",
   "keywords": [
