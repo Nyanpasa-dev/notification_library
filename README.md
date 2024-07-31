@@ -4,11 +4,11 @@ noty-nyan is a TypeScript-based service for managing and sending notifications t
 
 ## Table of Contents
 
-- Installation
-- Usage
-- Configuration
-- API
-- Testing
+-   Installation
+-   Usage
+-   Configuration
+-   API
+-   Testing
 
 ## Installation
 
@@ -30,9 +30,9 @@ npm start
 
 The Notification Manager can be configured using environment variables:
 
-- `SECRET_KEY`: The secret key used for JWT verification.
-- `REDIS_HOST`: The Redis server host (default: `localhost`).
-- `REDIS_PORT`: The Redis server port (default: `6379`).
+-   `SECRET_KEY`: The secret key used for JWT verification.
+-   `REDIS_HOST`: The Redis server host (default: `localhost`).
+-   `REDIS_PORT`: The Redis server port (default: `6379`).
 
 ## API
 
@@ -42,12 +42,12 @@ The Notification Manager can be configured using environment variables:
 
 ```typescript
 interface EmmediatelyData {
-  type: string;
-  item: any;
-  message: string;
-  receivers?: number[] | null;
-  email?: EmailParams;
-  telegram?: TelegramParams;
+    type: string
+    item: any
+    message: string
+    receivers?: number[] | null
+    email?: EmailParams
+    telegram?: TelegramParams
 }
 ```
 
@@ -55,7 +55,7 @@ interface EmmediatelyData {
 
 ```typescript
 interface DelayedQueueData extends EmmediatelyData {
-  delay?: number | null;
+    delay?: number | null
 }
 ```
 
@@ -63,10 +63,10 @@ interface DelayedQueueData extends EmmediatelyData {
 
 ```typescript
 interface SendMessageParams {
-  key: string;
-  data: any;
-  receivers?: number[] | null;
-  message?: string;
+    key: string
+    data: any
+    receivers?: number[] | null
+    message?: string
 }
 ```
 
@@ -74,9 +74,9 @@ interface SendMessageParams {
 
 ```typescript
 interface TelegramParams<T = string> {
-  token: string;
-  receivers: T[];
-  message: string;
+    token: string
+    receivers: T[]
+    message: string
 }
 ```
 
@@ -84,8 +84,8 @@ interface TelegramParams<T = string> {
 
 ```typescript
 interface EmailParams {
-  receivers: string[];
-  message: string;
+    receivers: string[]
+    message: string
 }
 ```
 
@@ -119,7 +119,6 @@ To run the tests, use:
 npm test
 ```
 
-
 ---
 
 # noty-nyan[RU]
@@ -128,11 +127,11 @@ noty-nyan — это сервис на TypeScript для управления и
 
 ## Содержание
 
-- Установка
-- Использование
-- Конфигурация
-- API
-- Тестирование
+-   Установка
+-   Использование
+-   Конфигурация
+-   API
+-   Тестирование
 
 ## Установка
 
@@ -154,9 +153,9 @@ npm start
 
 Менеджер Уведомлений можно настроить с помощью переменных окружения:
 
-- `SECRET_KEY`: Секретный ключ, используемый для проверки JWT.
-- `REDIS_HOST`: Хост сервера Redis (по умолчанию: `localhost`).
-- `REDIS_PORT`: Порт сервера Redis (по умолчанию: `6379`).
+-   `SECRET_KEY`: Секретный ключ, используемый для проверки JWT.
+-   `REDIS_HOST`: Хост сервера Redis (по умолчанию: `localhost`).
+-   `REDIS_PORT`: Порт сервера Redis (по умолчанию: `6379`).
 
 ## API
 
@@ -166,12 +165,12 @@ npm start
 
 ```typescript
 interface EmmediatelyData {
-  type: string;
-  item: any;
-  message: string;
-  receivers?: number[] | null;
-  email?: EmailParams;
-  telegram?: TelegramParams;
+    type: string
+    item: any
+    message: string
+    receivers?: number[] | null
+    email?: EmailParams
+    telegram?: TelegramParams
 }
 ```
 
@@ -179,7 +178,7 @@ interface EmmediatelyData {
 
 ```typescript
 interface DelayedQueueData extends EmmediatelyData {
-  delay?: number | null;
+    delay?: number | null
 }
 ```
 
@@ -187,10 +186,10 @@ interface DelayedQueueData extends EmmediatelyData {
 
 ```typescript
 interface SendMessageParams {
-  key: string;
-  data: any;
-  receivers?: number[] | null;
-  message?: string;
+    key: string
+    data: any
+    receivers?: number[] | null
+    message?: string
 }
 ```
 
@@ -198,9 +197,9 @@ interface SendMessageParams {
 
 ```typescript
 interface TelegramParams<T = string> {
-  token: string;
-  receivers: T[];
-  message: string;
+    token: string
+    receivers: T[]
+    message: string
 }
 ```
 
@@ -208,8 +207,8 @@ interface TelegramParams<T = string> {
 
 ```typescript
 interface EmailParams {
-  receivers: string[];
-  message: string;
+    receivers: string[]
+    message: string
 }
 ```
 
