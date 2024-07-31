@@ -43,11 +43,6 @@ export interface SendMessageParams {
  */
 export interface TelegramParams<T = string> {
     /**
-     * Токен для доступа к Telegram API.
-     */
-    token: string
-
-    /**
      * Список получателей уведомления.
      */
     receivers: T[]
@@ -159,4 +154,9 @@ export interface NotificationManagerOptions {
      * Метод отправки уведомлений.
      */
     sendingMethod?: 'ws' | 'push'
+
+    /**
+     * Токен для Telegram.
+     */
+    telegramToken?: string
 }

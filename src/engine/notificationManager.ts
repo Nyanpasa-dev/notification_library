@@ -15,13 +15,14 @@ class NotificationManager {
     private queue: Queue
     private worker: Worker
     private queueEvents: QueueEvents
+    private bot?: Telegraf
 
     constructor({
         redisConnection = { host: 'localhost', port: 6379 },
         wsConnection = { port: 4461, isProduction: false },
         queueName = 'defaultQueue',
         sendingMethod = 'ws',
-        telegramToken
+        telegramToken = '',
     }: NotificationManagerOptions) {
         this.gateway = new ImmediatelyBroadcastingGateway(wsConnection)
         this.queue = new Queue(queueName, { connection: redisConnection })
@@ -34,7 +35,7 @@ class NotificationManager {
         )
         this.queueEvents = new QueueEvents(queueName)
 
-        if (telegramToken) {
+        if (!!telegramToken) {
             this.bot = new Telegraf(telegramToken)
             this.bot.launch()
         }
@@ -133,15 +134,16 @@ class NotificationManager {
     }
 
     private async sendTelegramNotification({
-        token,
         receivers,
         message,
     }: TelegramParams): Promise<void> {
-        const bot = new Telegraf(token)
-        await bot.launch()
+
+      if(!this.bot) {
+        return console.log('telegram bot is not initialized')
+      }
 
         for (const receiver of receivers) {
-            await bot.telegram.sendMessage(receiver, message, { parse_mode: 'MarkdownV2' })
+            await this.bot?.telegram.sendMessage(receiver, message, { parse_mode: 'MarkdownV2' })
         }
     }
 

@@ -1,13 +1,33 @@
-import { Telegraf } from 'telegraf'
+import {  Telegraf } from 'telegraf'
 import { NotificationManager } from '../src/engine/notificationManager'
-import { DelayedQueueData, TelegramParams } from '../src/types'
+import { DelayedQueueData, NotificationManagerOptions, TelegramParams } from '../src/types'
+import { mock } from 'jest-mock-extended'
+import { ParseMode } from 'telegraf/types';
 
+jest.mock('telegraf', () => {
+    return {
+        Telegraf: jest.fn().mockImplementation(() => {
+            return {
+                telegram: {
+                    sendMessage: jest.fn(),
+                },
+                launch: jest.fn(),
+            };
+        }),
+    };
+});
 
 describe('NotificationManager', () => {
     let notificationManager: NotificationManager
 
     beforeAll(() => {
-        notificationManager = new NotificationManager({})
+        notificationManager = new NotificationManager({
+            telegramToken: "fakeToken",
+        })
+    })
+
+    afterEach( async() => {
+        jest.clearAllMocks()
     })
 
     afterAll(async () => {
@@ -113,3 +133,67 @@ describe('NotificationManager', () => {
     })
 
 })
+
+
+jest.mock('telegraf', () => {
+    return {
+        Telegraf: jest.fn().mockImplementation(() => {
+            return {
+                telegram: {
+                    sendMessage: jest.fn(),
+                },
+                launch: jest.fn(),
+            };
+        }),
+    };
+});
+
+describe('Telegraf telegram.sendMessage', () => {
+    let telegraf: Telegraf;
+    let notificationManager: NotificationManager;
+    let mockBot: any;
+    notificationManager = new NotificationManager({ telegramToken: 'fakeToken' });
+
+    beforeEach(() => {
+        mockBot = {
+            telegram: {
+                sendMessage: jest.fn()
+            }
+        };
+        notificationManager['bot'] = mockBot; // Inject the mock bot
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    afterAll(async () => {
+        // Close WebSocket server
+        await notificationManager.closeResources();
+    })
+
+    it('should log a message if the bot is not initialized', async () => {
+        console.log = jest.fn();
+        notificationManager['bot'] = undefined; // Set bot to null
+        //@ts-ignore
+        await notificationManager.sendTelegramNotification({
+            receivers: ['receiver1'],
+            message: 'Test message'
+        });
+
+        expect(console.log).toHaveBeenCalledWith('telegram bot is not initialized');
+    });
+
+    it('should send messages to all receivers if the bot is initialized', async () => {
+        const receivers = ['receiver1', 'receiver2'];
+        const message = 'Test message';
+
+        //@ts-ignore
+        await notificationManager.sendTelegramNotification({ receivers, message });
+
+        expect(mockBot.telegram.sendMessage).toHaveBeenCalledTimes(receivers.length);
+        receivers.forEach(receiver => {
+            expect(mockBot.telegram.sendMessage).toHaveBeenCalledWith(receiver, message, { parse_mode: 'MarkdownV2' });
+        });
+    });
+});
