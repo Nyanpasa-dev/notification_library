@@ -116,17 +116,12 @@ export interface RedisConnection {
     /**
      * Хост Redis.
      */
-    host?: string
+    host: string
 
     /**
      * Порт Redis.
      */
-    port?: number
-
-    /**
-     * Пароль Redis.
-     */
-    password?: string
+    port: number
 }
 
 export interface WebSocketConnection {

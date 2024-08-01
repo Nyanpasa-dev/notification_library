@@ -1,4 +1,3 @@
-import { RedisConnection, WebSocketConnection } from './../types/index.d';
 import {
     DelayedQueueData,
     EmailParams,
@@ -12,60 +11,46 @@ import { ImmediatelyBroadcastingGateway } from './webSocket'
 import { Queue, Worker, QueueEvents, JobsOptions } from 'bullmq'
 
 class NotificationManager {
-    private gateway?: Gateway
-    private queue?: Queue
-    private worker?: Worker
-    private queueEvents?: QueueEvents
+    private gateway: Gateway
+    private queue: Queue
+    private worker: Worker
+    private queueEvents: QueueEvents
     private bot?: Telegraf
 
-    constructor() {}
-
-    public static create(): NotificationManager {
-        return new NotificationManager()
-    }
-
-
-    public InitQueue({host = 'localhost', port = 6379}:  RedisConnection = {}, bullQueueName: string = "defaultQueueName"): this {
-        this.queue = new Queue(bullQueueName, { connection: {host, port}  })
-
+    constructor({
+        redisConnection = { host: 'localhost', port: 6379 },
+        wsConnection = { port: 4461, isProduction: false },
+        queueName = 'defaultQueue',
+        sendingMethod = 'ws',
+        telegramToken = '',
+    }: NotificationManagerOptions) {
+        this.gateway = new ImmediatelyBroadcastingGateway(wsConnection)
+        this.queue = new Queue(queueName, { connection: redisConnection })
         this.worker = new Worker(
-            bullQueueName,
+            queueName,
             async (job) => {
                 await this.processJob(job)
             },
-            { connection: {host, port} },
+            { connection: redisConnection },
         )
-        this.queueEvents = new QueueEvents(bullQueueName)
+        this.queueEvents = new QueueEvents(queueName)
+
+        if (!!telegramToken) {
+            this.bot = new Telegraf(telegramToken)
+            this.bot.launch()
+        }
 
         this.setupQueueEvents()
-
-        return this
     }
-
-    public InitWsConnection(wsConnection: WebSocketConnection): this {
-        this.gateway = new ImmediatelyBroadcastingGateway(wsConnection)
-        return this
-    }
-
-    public InitTelegramConnection(telegramToken: string): this {
-        this.bot = new Telegraf(telegramToken)
-        this.bot.launch()
-        return this
-    }
-
-    public InitEmailConnection(emailConnection: any): this {
-
-        return this
-    }
-
 
     private setupQueueEvents(): void {
-        this.queueEvents?.on('completed', ({ jobId }) => {})
-        this.queueEvents?.on('failed', ({ jobId, failedReason }) => {})
+        this.queueEvents.on('completed', ({ jobId }) => {})
+
+        this.queueEvents.on('failed', ({ jobId, failedReason }) => {})
     }
 
     private async sendNotification(data: EmmediatelyData): Promise<void> {
-        this.gateway?.send({
+        this.gateway.send({
             key: data.type,
             data: data.item,
             receivers: data.receivers,
@@ -129,7 +114,7 @@ class NotificationManager {
     private async addNotificationToQueue(data: DelayedQueueData): Promise<void> {
         const { delay, ...notificationData } = data
         const options: JobsOptions = delay ? { delay } : {}
-        await this.queue?.add('notification', notificationData, options)
+        await this.queue.add('notification', notificationData, options)
     }
 
     private async processJob(job: any): Promise<void> {
@@ -137,7 +122,7 @@ class NotificationManager {
         const data = { type, item, sender, details, message }
         const receiverIds = receivers ? receivers.map(String) : []
 
-        this.gateway?.send({ key: type, data, receivers: receiverIds, message })
+        this.gateway.send({ key: type, data, receivers: receiverIds, message })
 
         if (telegram) {
             await this.sendTelegramNotification(telegram)
@@ -167,10 +152,10 @@ class NotificationManager {
     }
 
     public async closeResources() {
-        this.gateway?.close()
-        await this.queue?.close()
-        await this.worker?.close()
-        await this.queueEvents?.close()
+        this.gateway.close()
+        await this.queue.close()
+        await this.worker.close()
+        await this.queueEvents.close()
     }
 }
 
