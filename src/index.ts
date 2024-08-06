@@ -1,2 +1,2 @@
-export * from './engine/notificationManager'
+export * from './bin/notificationManager'
 // export * from './engine/webSocket';

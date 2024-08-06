@@ -32,6 +32,7 @@
         "jsonwebtoken": "^9.0.2",
         "sequelize": "6.37.3",
         "telegraf": "^4.16.3",
+        "uuid": "^10.0.0",
         "ws": "^8.17.0"
     },
     "author": "https://github.com/Nyanpasa-dev",
@@ -39,6 +40,7 @@
     "devDependencies": {
         "@types/jest": "^29.5.12",
         "@types/jsonwebtoken": "^9.0.6",
+        "@types/uuid": "^10.0.0",
         "eslint": "^8.57.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-jest": "^27.9.0",

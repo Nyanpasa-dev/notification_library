@@ -17,6 +17,7 @@ export interface EmmediatelyData {
  */
 export interface DelayedQueueData extends EmmediatelyData {
     delay?: number | null
+    customJobId?: string
 }
 
 /**

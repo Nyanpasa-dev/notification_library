@@ -1,7 +1,7 @@
 import { Telegraf } from 'telegraf';
-import { NotificationManager } from '../src/engine/notificationManager';
+import { NotificationManager } from '../src/bin/notificationManager';
 import { DelayedQueueData, EmmediatelyData } from '../src/types';
-import { mock } from 'jest-mock-extended';
+import { v4 as uuidv4 } from 'uuid';
 
 jest.mock('telegraf', () => {
     return {
@@ -21,11 +21,11 @@ describe('NotificationManager', () => {
 
     beforeAll(() => {
         notificationManager = NotificationManager.create();
-        notificationManager.InitQueue();
+        notificationManager.initQueue();
     });
 
-    afterAll(async() => {
-         await notificationManager.closeResources();
+    afterAll(async () => {
+        await notificationManager.closeResources();
     });
 
     it('should send delayed notification', async () => {
@@ -34,6 +34,7 @@ describe('NotificationManager', () => {
             item: 'notification',
             message: 'Hello',
             delay: 10000,
+            customJobId: uuidv4(),
         };
 
         await expect(
@@ -47,13 +48,13 @@ describe('NotificationManager', () => {
                 type: 'immediate',
                 item: 'notification1',
                 message: 'Hello 1',
-                receivers: [2],
+                receivers: [1],
             },
             {
                 type: 'immediate',
                 item: 'notification2',
                 message: 'Hello 2',
-                receivers: [3],
+                receivers: [1],
             },
         ];
 
@@ -69,12 +70,14 @@ describe('NotificationManager', () => {
                 item: 'notification1',
                 message: 'Hello 1',
                 delay: 5000,
+                customJobId: uuidv4(),
             },
             {
                 type: 'delayed',
                 item: 'notification2',
                 message: 'Hello 2',
                 delay: 10000,
+                customJobId: uuidv4(),
             },
         ];
 
@@ -131,8 +134,8 @@ describe('Telegraf telegram.sendMessage', () => {
     let mockBot: any;
 
     beforeAll(() => {
-        notificationManager =  NotificationManager.create();
-        notificationManager.InitTelegramConnection('fakeToken');
+        notificationManager = NotificationManager.create();
+        notificationManager.initTelegramConnection('fakeToken');
     });
 
     beforeEach(() => {
@@ -161,7 +164,7 @@ describe('Telegraf telegram.sendMessage', () => {
             message: 'Test message',
         });
 
-        expect(console.log).toHaveBeenCalledWith('telegram bot is not initialized');
+        expect(console.log).toHaveBeenCalledWith('Telegram bot is not initialized');
     });
 
     it('should send messages to all receivers if the bot is initialized', async () => {
