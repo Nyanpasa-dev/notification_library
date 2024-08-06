@@ -148,7 +148,7 @@ describe('Telegraf telegram.sendMessage', () => {
                 sendMessage: jest.fn(),
             },
         };
-        
+
         if(notificationManager['telegramNotificationManager']){
             notificationManager['telegramNotificationManager']['bot'] = mockBot; // Inject the mock bot
         }

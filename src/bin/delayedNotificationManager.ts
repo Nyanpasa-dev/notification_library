@@ -1,6 +1,7 @@
 import { Queue, Worker, QueueEvents, JobsOptions } from 'bullmq';
 import { v4 as uuidv4 } from 'uuid';
-import { DelayedQueueData, RedisConnection } from '../types';
+import { DelayedQueueData, Gateway, RedisConnection } from '../types/index.js';
+import { WebSocketSingleton } from './webSocketSingleton.js';
 
 export interface QueueManager {
     broadcastDelayedNotification(data: DelayedQueueData): Promise<void>;
@@ -12,6 +13,7 @@ export class DelayedNotificationManager implements QueueManager {
   private queue?: Queue;
   private worker?: Worker;
   private queueEvents?: QueueEvents;
+  private gateway?: Gateway;
 
   public initBullQueue(
       { host = 'localhost', port = 6379 }: RedisConnection = {},
@@ -29,6 +31,7 @@ export class DelayedNotificationManager implements QueueManager {
       this.queueEvents = new QueueEvents(queueName);
       this.setupQueueEvents();
 
+      this.gateway = WebSocketSingleton.getInstance();
       return this;
   }
 
@@ -71,7 +74,12 @@ export class DelayedNotificationManager implements QueueManager {
       const { type, item, sender, details, message, receivers, telegram, email } = job.data;
       const receiverIds = receivers ? receivers.map(String) : [];
 
-      // Implement the logic to send the notification
+      this.gateway?.send({
+            key: type,
+            data: item,
+            receivers: receiverIds,
+            message,
+        });
   }
 
   public async closeResources(): Promise<void> {

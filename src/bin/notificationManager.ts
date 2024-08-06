@@ -1,7 +1,7 @@
 import { DelayedQueueData, EmmediatelyData, RedisConnection, TelegramParams, WebSocketConnection } from '../types';
-import { DelayedNotificationManager } from './delayedNotificationManager';
-import { ImmediateNotificationManager } from './immediateNotificationManager';
-import { TelegramNotificationManager } from './telegramNotificationManager';
+import { DelayedNotificationManager } from './delayedNotificationManager.js';
+import { ImmediateNotificationManager } from './immediateNotificationManager.js';
+import { TelegramNotificationManager } from './telegramNotificationManager.js';
 
 interface BaseNotificationManager {
     closeResources(): Promise<void>;
@@ -27,9 +27,9 @@ type NotificationManager = BaseNotificationManager &
     Partial<TelegramInitialized>;
 
 class NotificationManagerImpl implements NotificationManager {
-    protected delayedNotificationManager?: DelayedNotificationManager;
-    protected immediateNotificationManager?: ImmediateNotificationManager;
-    protected telegramNotificationManager?: TelegramNotificationManager;
+    private delayedNotificationManager?: DelayedNotificationManager;
+    private immediateNotificationManager?: ImmediateNotificationManager;
+    private telegramNotificationManager?: TelegramNotificationManager;
 
     private queueInitialized: boolean = false;
     private wsInitialized: boolean = false;

@@ -2,8 +2,8 @@ import * as https from 'https'
 import * as http from 'http'
 import { readFileSync } from 'fs'
 import { WebSocketServer, WebSocket } from 'ws'
-import { handleConnection } from '../helpers/connectionHandler'
-import { Client, Gateway, MessageData, SendMessageParams, WebSocketConnection } from '../types'
+import { handleConnection } from '../helpers/connectionHandler.js'
+import { Client, Gateway, MessageData, SendMessageParams, WebSocketConnection } from '../types/index.js'
 
 class MyGateway implements Gateway {
     private clients: Set<Client>
@@ -36,16 +36,25 @@ class MyGateway implements Gateway {
             clientTracking: true,
         })
 
+
+
         this.wss.on('connection', (ws: Client, req) => {
+            console.log('New connection')
             this.handleConnection(ws, req)
         })
 
         this.server.listen(this.port, () => {
             console.log(`WebSocket server started on port ${this.port}`)
+            console.log(this.server?.address())
+            console.log(this.wss?.address())
         })
 
         this.server.on('error', (error: Error) => {
             console.error('WebSocket server error:', error.message)
+        })
+
+        this.server.on('close', () => {
+            console.log('WebSocket server closed')
         })
 
         this.startHeartbeat()
@@ -82,8 +91,10 @@ class MyGateway implements Gateway {
     }
 
     private startHeartbeat(): void {
+        console.log('Starting heartbeat')
         this.heartbeatInterval = setInterval(() => {
             this.wss?.clients.forEach((ws: WebSocket, _ws2: WebSocket, _set: Set<WebSocket>) => {
+                console.log('Checking heartbeat')
                 const client = ws as Client
                 if (!client.isAlive) {
                     return client.terminate()

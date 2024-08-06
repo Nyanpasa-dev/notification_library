@@ -1,19 +1,19 @@
 import { EmmediatelyData, Gateway, SendMessageParams, WebSocketConnection } from '../types';
-import { WebSocket } from './webSocket';
+import { WebSocketSingleton } from './webSocketSingleton.js';
 
 export interface ImmediateManager {
   broadcastEmmediatelyNotification(data: EmmediatelyData): Promise<void>;
   bulkBroadcastEmmediatelyNotification(data: EmmediatelyData[]): Promise<void>;
-  closeResources(): Promise<void>;
+  closeResources(): Promise< void>;
 }
 
 export class ImmediateNotificationManager implements ImmediateManager {
   private gateway?: Gateway;
 
   public initWsConnection(params?: WebSocketConnection): this {
-       this.gateway = new WebSocket(params);
-       return this;
-  }
+    this.gateway = WebSocketSingleton.getInstance(params);
+    return this;
+}
 
   public async broadcastEmmediatelyNotification(data: EmmediatelyData): Promise<void> {
       if (data.receivers?.length === 0) {

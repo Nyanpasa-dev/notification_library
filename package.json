@@ -1,13 +1,14 @@
 {
     "name": "@nyanpasa-dev/noty-nyan",
-    "version": "1.0.2",
+    "version": "2.0.0",
     "description": "A real-time notification system using WebSockets, Redis queues, Telegram and Email integration. It supports scalable and asynchronous notification delivery.",
     "files": [
         "dist"
     ],
     "scripts": {
         "build": "tsc",
-        "test": "jest --detectOpenHandles"
+        "test": "jest --detectOpenHandles",
+        "start": "node test.usage.mjs"
     },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com/"

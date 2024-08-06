@@ -1,6 +1,6 @@
-import { verify, JwtPayload } from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import * as http from 'http'
-import { Client } from '../types'
+import { Client } from '../types/index.js'
 
 export function handleConnection(
     ws: Client,
@@ -20,10 +20,9 @@ export function handleConnection(
     }
 
     try {
-        const decoded = verify(token, process.env['SECRET_KEY'] ?? '')
-        ws.userId = (decoded as JwtPayload).id
-        ws.telegram = (decoded as JwtPayload).telegram
-        clients.add(ws)
+        const decoded = jwt.verify(token, process.env['SECRET_KEY'] ?? '') as JwtPayload
+        ws.userId = decoded.id
+        ws.telegram = decoded.telegram
 
         ws.send(JSON.stringify({ message: 'Подключение успешно установлено' }))
     } catch (err) {

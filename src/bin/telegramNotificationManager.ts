@@ -1,5 +1,5 @@
 import { Telegraf } from "telegraf";
-import { TelegramParams } from "../types";
+import { TelegramParams } from "../types/index.js";
 
 export interface TelegramManager {
   sendTelegramNotification(params: TelegramParams): Promise<void>;
