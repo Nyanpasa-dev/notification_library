@@ -10,7 +10,7 @@ export interface ImmediateManager {
 export class ImmediateNotificationManager implements ImmediateManager {
   private gateway?: Gateway;
 
-  public initWsConnection(params: WebSocketConnection): this {
+  public initWsConnection(params?: WebSocketConnection): this {
        this.gateway = new WebSocket(params);
        return this;
   }

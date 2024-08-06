@@ -1,4 +1,4 @@
-import { RedisConnection, WebSocketConnection } from '../types';
+import { DelayedQueueData, EmmediatelyData, RedisConnection, TelegramParams, WebSocketConnection } from '../types';
 import { DelayedNotificationManager } from './delayedNotificationManager';
 import { ImmediateNotificationManager } from './immediateNotificationManager';
 import { TelegramNotificationManager } from './telegramNotificationManager';
@@ -68,15 +68,15 @@ class NotificationManagerImpl implements NotificationManager {
         await this.telegramNotificationManager.closeResources();
     }
 
-    public async sendImmediateNotification(data: any): Promise<void> {
+    public async sendImmediateNotification(data: EmmediatelyData): Promise<void> {
         await this.immediateNotificationManager.broadcastEmmediatelyNotification(data);
     }
 
-    public async sendDelayedNotification(data: any): Promise<void> {
+    public async sendDelayedNotification(data: DelayedQueueData): Promise<void> {
         await this.delayedNotificationManager.broadcastDelayedNotification(data);
     }
 
-    public async sendTelegramNotification(data: any): Promise<void> {
+    public async sendTelegramNotification(data: TelegramParams): Promise<void> {
         await this.telegramNotificationManager.sendTelegramNotification(data);
     }
 }
