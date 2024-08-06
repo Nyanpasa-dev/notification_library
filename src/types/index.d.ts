@@ -131,9 +131,9 @@ export interface RedisConnection {
 }
 
 export interface WebSocketConnection {
-    port: number
+    port?: number
 
-    isProduction: boolean
+    isProduction?: boolean
 }
 
 /**

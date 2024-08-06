@@ -13,11 +13,11 @@ class MyGateway implements Gateway {
     private port: number
     private isProduction: boolean
 
-    constructor({ port = 8080, isProduction = false }: WebSocketConnection) {
+    constructor({ port = 4461, isProduction = false }: WebSocketConnection = {}) {
         this.clients = new Set<Client>()
         this.initializeModules()
-        this.port = port || 4461 //4461 by default
-        this.isProduction = isProduction || false //localhost by default
+        this.port = port
+        this.isProduction = isProduction
     }
 
     private initializeModules(): void {
@@ -110,4 +110,4 @@ class MyGateway implements Gateway {
     }
 }
 
-export { MyGateway as ImmediatelyBroadcastingGateway }
+export { MyGateway as WebSocket }

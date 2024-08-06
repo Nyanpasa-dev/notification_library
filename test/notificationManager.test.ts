@@ -1,6 +1,6 @@
 import { Telegraf } from 'telegraf';
 import { NotificationManager } from '../src/bin/notificationManager';
-import { DelayedQueueData, EmmediatelyData } from '../src/types';
+import { DelayedQueueData, EmmediatelyData, EmailParams, TelegramParams } from '../src/types';
 import { v4 as uuidv4 } from 'uuid';
 
 jest.mock('telegraf', () => {
@@ -20,8 +20,13 @@ describe('NotificationManager', () => {
     let notificationManager: NotificationManager;
 
     beforeAll(() => {
-        notificationManager = NotificationManager.create();
-        notificationManager.initQueue();
+        const manager = NotificationManager.create()
+        .initQueue()
+        .initWsConnection()
+        .initTelegramConnection('fakeToken');
+
+
+        notificationManager.initQueue({ host: 'localhost', port: 6379 }, 'defaultQueueName');
     });
 
     afterAll(async () => {
@@ -38,7 +43,7 @@ describe('NotificationManager', () => {
         };
 
         await expect(
-            notificationManager.broadcastDelayedNotification(data),
+            notificationManager.initQueue(),
         ).resolves.toBeInstanceOf(NotificationManager);
     });
 
@@ -144,7 +149,7 @@ describe('Telegraf telegram.sendMessage', () => {
                 sendMessage: jest.fn(),
             },
         };
-        notificationManager['bot'] = mockBot; // Inject the mock bot
+        notificationManager['telegramNotificationManager']['bot'] = mockBot; // Inject the mock bot
     });
 
     afterEach(() => {
@@ -157,12 +162,11 @@ describe('Telegraf telegram.sendMessage', () => {
 
     it('should log a message if the bot is not initialized', async () => {
         console.log = jest.fn();
-        notificationManager['bot'] = undefined; // Set bot to null
-        //@ts-ignore
+        notificationManager['telegramNotificationManager']['bot'] = undefined; // Set bot to null
         await notificationManager.sendTelegramNotification({
             receivers: ['receiver1'],
             message: 'Test message',
-        });
+        } as TelegramParams);
 
         expect(console.log).toHaveBeenCalledWith('Telegram bot is not initialized');
     });
@@ -171,8 +175,7 @@ describe('Telegraf telegram.sendMessage', () => {
         const receivers = ['receiver1', 'receiver2'];
         const message = 'Test message';
 
-        //@ts-ignore
-        await notificationManager.sendTelegramNotification({ receivers, message });
+        await notificationManager.sendTelegramNotification({ receivers, message } as TelegramParams);
 
         expect(mockBot.telegram.sendMessage).toHaveBeenCalledTimes(receivers.length);
         receivers.forEach(receiver => {
