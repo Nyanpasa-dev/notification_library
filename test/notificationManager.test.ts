@@ -1,3 +1,4 @@
+import { Queue } from 'bullmq';
 import { Telegraf } from 'telegraf';
 import { NotificationManager } from '../src/bin/notificationManager';
 import { DelayedQueueData, EmmediatelyData, EmailParams, TelegramParams } from '../src/types';
@@ -17,20 +18,17 @@ jest.mock('telegraf', () => {
 });
 
 describe('NotificationManager', () => {
-    let notificationManager: NotificationManager;
+    let QueueManager: any;
+    let ImmediateManager: any;
 
     beforeAll(() => {
-        const manager = NotificationManager.create()
-        .initQueue()
-        .initWsConnection()
-        .initTelegramConnection('fakeToken');
-
-
-        notificationManager.initQueue({ host: 'localhost', port: 6379 }, 'defaultQueueName');
+        QueueManager = NotificationManager.create().initQueue({ host: 'localhost', port: 6379 }, 'defaultQueueName');
+        ImmediateManager = NotificationManager.create().initWsConnection({ port: 3000 });
     });
 
     afterAll(async () => {
-        await notificationManager.closeResources();
+        await QueueManager.closeResources();
+        await ImmediateManager.closeResources();
     });
 
     it('should send delayed notification', async () => {
@@ -43,8 +41,8 @@ describe('NotificationManager', () => {
         };
 
         await expect(
-            notificationManager.initQueue(),
-        ).resolves.toBeInstanceOf(NotificationManager);
+            QueueManager.sendDelayedNotification(data),
+        ).resolves.toBeUndefined();
     });
 
     it('should send bulk immediate notifications', async () => {
@@ -64,8 +62,8 @@ describe('NotificationManager', () => {
         ];
 
         await expect(
-            notificationManager.bulkBroadcastEmmediatelyNotification(data),
-        ).resolves.toBeInstanceOf(NotificationManager);
+            ImmediateManager.sendBulkImmediateNotification(data),
+        ).resolves.toBeUndefined();
     });
 
     it('should send bulk delayed notifications', async () => {
@@ -87,8 +85,8 @@ describe('NotificationManager', () => {
         ];
 
         await expect(
-            notificationManager.bulkBroadcastDelayedNotification(data, 5000),
-        ).resolves.toBeInstanceOf(NotificationManager);
+            QueueManager.sendBulkDelayedNotification(data, 5000),
+        ).resolves.toBeUndefined();
     });
 
     it('should throw an error if receivers list is empty for immediate notification', async () => {
@@ -99,7 +97,7 @@ describe('NotificationManager', () => {
             receivers: [],
         };
 
-        await expect(notificationManager.broadcastEmmediatelyNotification(data)).rejects.toThrow(
+        await expect(ImmediateManager.sendImmediateNotification(data)).rejects.toThrow(
             'Receivers list is empty.',
         );
     });
@@ -108,7 +106,7 @@ describe('NotificationManager', () => {
         const data: EmmediatelyData[] = [];
 
         await expect(
-            notificationManager.bulkBroadcastEmmediatelyNotification(data),
+            ImmediateManager.sendBulkImmediateNotification(data),
         ).rejects.toThrow('Data is empty.');
     });
 
@@ -120,7 +118,7 @@ describe('NotificationManager', () => {
             delay: -1000,
         };
 
-        await expect(notificationManager.broadcastDelayedNotification(data)).rejects.toThrow(
+        await expect(QueueManager.sendDelayedNotification(data)).rejects.toThrow(
             'Delay is invalid.',
         );
     });
@@ -129,7 +127,7 @@ describe('NotificationManager', () => {
         const data: DelayedQueueData[] = [];
 
         await expect(
-            notificationManager.bulkBroadcastDelayedNotification(data, 5000),
+            QueueManager.sendBulkDelayedNotification(data, 5000),
         ).rejects.toThrow('Data is empty.');
     });
 });

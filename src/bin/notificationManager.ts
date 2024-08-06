@@ -9,10 +9,12 @@ interface BaseNotificationManager {
 
 interface QueueInitialized extends BaseNotificationManager {
     sendDelayedNotification(data: DelayedQueueData): Promise<void>;
+    sendBulkDelayedNotification(data: DelayedQueueData[], delay: number): Promise<void>;
 }
 
 interface WsInitialized extends BaseNotificationManager {
     sendImmediateNotification(data: EmmediatelyData): Promise<void>;
+    sendBulkImmediateNotification(data: EmmediatelyData[]): Promise<void>;
 }
 
 interface TelegramInitialized extends BaseNotificationManager {
@@ -25,9 +27,9 @@ type NotificationManager = BaseNotificationManager &
     Partial<TelegramInitialized>;
 
 class NotificationManagerImpl implements NotificationManager {
-    private delayedNotificationManager: DelayedNotificationManager;
-    private immediateNotificationManager: ImmediateNotificationManager;
-    private telegramNotificationManager: TelegramNotificationManager;
+    protected delayedNotificationManager: DelayedNotificationManager;
+    protected immediateNotificationManager: ImmediateNotificationManager;
+    protected telegramNotificationManager: TelegramNotificationManager;
 
     constructor(
         delayedNotificationManager: DelayedNotificationManager,
@@ -72,8 +74,16 @@ class NotificationManagerImpl implements NotificationManager {
         await this.immediateNotificationManager.broadcastEmmediatelyNotification(data);
     }
 
+    public async sendBulkImmediateNotification(data: EmmediatelyData[]): Promise<void> {
+        await this.immediateNotificationManager.bulkBroadcastEmmediatelyNotification(data);
+    }
+
     public async sendDelayedNotification(data: DelayedQueueData): Promise<void> {
         await this.delayedNotificationManager.broadcastDelayedNotification(data);
+    }
+
+    public async sendBulkDelayedNotification(data: DelayedQueueData[], delay: number): Promise<void> {
+        await this.delayedNotificationManager.bulkBroadcastDelayedNotification(data, delay);
     }
 
     public async sendTelegramNotification(data: TelegramParams): Promise<void> {
