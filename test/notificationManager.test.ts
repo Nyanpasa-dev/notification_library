@@ -132,6 +132,7 @@ describe('NotificationManager', () => {
     });
 });
 
+
 describe('Telegraf telegram.sendMessage', () => {
     let notificationManager: NotificationManager;
     let mockBot: any;
@@ -147,7 +148,10 @@ describe('Telegraf telegram.sendMessage', () => {
                 sendMessage: jest.fn(),
             },
         };
-        notificationManager['telegramNotificationManager']['bot'] = mockBot; // Inject the mock bot
+        
+        if(notificationManager['telegramNotificationManager']){
+            notificationManager['telegramNotificationManager']['bot'] = mockBot; // Inject the mock bot
+        }
     });
 
     afterEach(() => {
@@ -160,7 +164,9 @@ describe('Telegraf telegram.sendMessage', () => {
 
     it('should log a message if the bot is not initialized', async () => {
         console.log = jest.fn();
-        notificationManager['telegramNotificationManager']['bot'] = undefined; // Set bot to null
+        if (notificationManager['telegramNotificationManager']) {
+            notificationManager['telegramNotificationManager']['bot'] = undefined; // Set bot to null
+        }
         await notificationManager.sendTelegramNotification({
             receivers: ['receiver1'],
             message: 'Test message',

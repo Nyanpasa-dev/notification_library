@@ -27,14 +27,18 @@ type NotificationManager = BaseNotificationManager &
     Partial<TelegramInitialized>;
 
 class NotificationManagerImpl implements NotificationManager {
-    protected delayedNotificationManager: DelayedNotificationManager;
-    protected immediateNotificationManager: ImmediateNotificationManager;
-    protected telegramNotificationManager: TelegramNotificationManager;
+    protected delayedNotificationManager?: DelayedNotificationManager;
+    protected immediateNotificationManager?: ImmediateNotificationManager;
+    protected telegramNotificationManager?: TelegramNotificationManager;
+
+    private queueInitialized: boolean = false;
+    private wsInitialized: boolean = false;
+    private telegramInitialized: boolean = false;
 
     constructor(
-        delayedNotificationManager: DelayedNotificationManager,
-        immediateNotificationManager: ImmediateNotificationManager,
-        telegramNotificationManager: TelegramNotificationManager
+        delayedNotificationManager?: DelayedNotificationManager,
+        immediateNotificationManager?: ImmediateNotificationManager,
+        telegramNotificationManager?: TelegramNotificationManager
     ) {
         this.delayedNotificationManager = delayedNotificationManager;
         this.immediateNotificationManager = immediateNotificationManager;
@@ -42,52 +46,89 @@ class NotificationManagerImpl implements NotificationManager {
     }
 
     public static create(): NotificationManagerImpl {
-        return new NotificationManagerImpl(
-            new DelayedNotificationManager(),
-            new ImmediateNotificationManager(),
-            new TelegramNotificationManager()
-        );
+        return new NotificationManagerImpl();
     }
 
     public initQueue(redisConnection?: RedisConnection, queueName?: string): QueueInitialized {
+        if (!this.delayedNotificationManager) {
+            this.delayedNotificationManager = new DelayedNotificationManager();
+        }
         this.delayedNotificationManager.initBullQueue(redisConnection, queueName);
+        this.queueInitialized = true;
         return this as QueueInitialized;
     }
 
     public initWsConnection(wsConnection?: WebSocketConnection): WsInitialized {
+        if (!this.immediateNotificationManager) {
+            this.immediateNotificationManager = new ImmediateNotificationManager();
+        }
         this.immediateNotificationManager.initWsConnection(wsConnection);
+        this.wsInitialized = true;
         return this as WsInitialized;
     }
 
     public initTelegramConnection(telegramToken: string): TelegramInitialized {
+        if (!this.telegramNotificationManager) {
+            this.telegramNotificationManager = new TelegramNotificationManager();
+        }
         this.telegramNotificationManager.initTelegramConnection(telegramToken);
+        this.telegramInitialized = true;
         return this as TelegramInitialized;
     }
 
     public async closeResources(): Promise<void> {
-        await this.delayedNotificationManager.closeResources();
-        await this.immediateNotificationManager.closeResources();
-        await this.telegramNotificationManager.closeResources();
+        if (this.queueInitialized && this.delayedNotificationManager) {
+            await this.delayedNotificationManager.closeResources();
+        }
+        if (this.wsInitialized && this.immediateNotificationManager) {
+            await this.immediateNotificationManager.closeResources();
+        }
+        if (this.telegramInitialized && this.telegramNotificationManager) {
+            await this.telegramNotificationManager.closeResources();
+        }
+    }
+
+    private ensureQueueInitialized() {
+        if (!this.queueInitialized) {
+            throw new Error('Queue is not initialized.');
+        }
+    }
+
+    private ensureWsInitialized() {
+        if (!this.wsInitialized) {
+            throw new Error('WebSocket connection is not initialized.');
+        }
+    }
+
+    private ensureTelegramInitialized() {
+        if (!this.telegramInitialized) {
+            throw new Error('Telegram connection is not initialized.');
+        }
     }
 
     public async sendImmediateNotification(data: EmmediatelyData): Promise<void> {
-        await this.immediateNotificationManager.broadcastEmmediatelyNotification(data);
+        this.ensureWsInitialized();
+        await this.immediateNotificationManager!.broadcastEmmediatelyNotification(data);
     }
 
     public async sendBulkImmediateNotification(data: EmmediatelyData[]): Promise<void> {
-        await this.immediateNotificationManager.bulkBroadcastEmmediatelyNotification(data);
+        this.ensureWsInitialized();
+        await this.immediateNotificationManager!.bulkBroadcastEmmediatelyNotification(data);
     }
 
     public async sendDelayedNotification(data: DelayedQueueData): Promise<void> {
-        await this.delayedNotificationManager.broadcastDelayedNotification(data);
+        this.ensureQueueInitialized();
+        await this.delayedNotificationManager!.broadcastDelayedNotification(data);
     }
 
     public async sendBulkDelayedNotification(data: DelayedQueueData[], delay: number): Promise<void> {
-        await this.delayedNotificationManager.bulkBroadcastDelayedNotification(data, delay);
+        this.ensureQueueInitialized();
+        await this.delayedNotificationManager!.bulkBroadcastDelayedNotification(data, delay);
     }
 
     public async sendTelegramNotification(data: TelegramParams): Promise<void> {
-        await this.telegramNotificationManager.sendTelegramNotification(data);
+        this.ensureTelegramInitialized();
+        await this.telegramNotificationManager!.sendTelegramNotification(data);
     }
 }
 
