@@ -8,15 +8,15 @@ interface BaseNotificationManager {
 }
 
 interface QueueInitialized extends BaseNotificationManager {
-    sendDelayedNotification(data: any): Promise<void>;
+    sendDelayedNotification(data: DelayedQueueData): Promise<void>;
 }
 
 interface WsInitialized extends BaseNotificationManager {
-    sendImmediateNotification(data: any): Promise<void>;
+    sendImmediateNotification(data: EmmediatelyData): Promise<void>;
 }
 
 interface TelegramInitialized extends BaseNotificationManager {
-    sendTelegramNotification(data: any): Promise<void>;
+    sendTelegramNotification(data: TelegramParams): Promise<void>;
 }
 
 type NotificationManager = BaseNotificationManager &
